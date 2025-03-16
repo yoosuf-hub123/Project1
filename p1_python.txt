@@ -1,0 +1,70 @@
+import numpy as np
+import pandas as pd
+
+############### RECEIVING PART #############
+
+a = pd.read_csv("D:/data_analyst/project/P1 - Sales Performance Dashboard/p1_python/P1_CSV.csv")
+# print(a)
+# print(a.head())
+
+############### CLEANING PART #############
+
+# print(a.isna())
+# print(a.isna().sum())
+a['Ordered Date']=pd.to_datetime(a['Ordered Date'],format="%d-%m-%Y")
+# print(a.head())
+# print(a.duplicated())
+a=a.drop_duplicates()
+# print(a.head())
+
+############### Calculate Total Sales, Profit & Discount #############
+
+total_sales=a['Sales Amount'].sum()
+total_profit=a['Exact Profit'].sum()
+total_discount=a['Discount'].sum()
+# print(f"Total sales = ₹ {round(total_sales/1000000,2)}M")
+# print(f"Total profit= ₹ {round(total_profit/1000,2)}k")
+# print(f"total discount = ₹ {round(total_discount/1000,2)}k")
+
+############### Find Top-Selling Products & Categories #############
+
+salesbyprod = a.groupby('Product')['Sales Amount'].sum().sort_values(ascending = False)
+topsellingprod= salesbyprod.head()
+# print("Top-Selling Products");print(topsellingprod)
+salesbycateg = a.groupby('Category')['Sales Amount'].sum().sort_values(ascending = False)
+topsellincateg = salesbycateg.head()
+# print("Top-Selling categories");print(topsellincateg)
+
+############### Calculate Monthly Sales Trend #############
+
+a['Ordered year and month'] = a['Ordered Date'].dt.to_period("M")
+MonthlySalesTrend = a.groupby('Ordered year and month')['Sales Amount'].sum().sort_index(ascending = True)
+# print(MonthlySalesTrend)
+
+############### Calculate Discount Impact on Profit #############
+
+a['Discount Impact'] =   a['Discount']/(a['Discount']+a['Exact Profit'])*100
+# print("Discount impact on profit in %")
+# print(a['Discount Impact'])
+
+###############  Compute Statistics on Sales & Profit  #############
+
+# print("Average of sales is ",round(a['Sales Amount'].mean(),2))
+# print("Median of sales is ",round(a['Sales Amount'].median(),2))
+# print("Variance of sales is ",round(a['Sales Amount'].var(),2))
+# print("\n")
+# print("Average of profit is ",round(a['Exact Profit'].mean(),2))
+# print("Median of profit is ",round(a['Exact Profit'].median(),2))
+# print("Variance of profit is ",round(a['Exact Profit'].var(),2))
+
+
+###############   Identify High-Profit Transactions  #############
+
+asortedbyprofit = a.sort_values(by='Exact Profit',ascending=False)
+# print(asortedbyprofit.head())
+
+###############   Save the Processed Data  #############
+
+# a.to_csv("D:/data_analyst/project/P1 - Sales Performance Dashboard/p1_python/outwithindex.csv")
+# a.to_csv("D:/data_analyst/project/P1 - Sales Performance Dashboard/p1_python/outwithoutindex.csv",index=False)
+# print("save done")
